@@ -2,13 +2,14 @@ import { Client } from "@notionhq/client";
 
 interface Env {
   NOTION_PAGE_ID: string;
-  NOTION_API_KEY: string; // Cloudflare Secrets等から取得
+  NOTION_API_KEY: string;
 }
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const notion = new Client({ auth: env.NOTION_API_KEY });
     const pageId = env.NOTION_PAGE_ID;
+    const cleanPageId = pageId.replace(/-/g, "");
 
     try {
       // 1. 指定したページのブロック一覧（子ブロック）を取得
@@ -33,11 +34,12 @@ export default {
         if (block.type === "heading_2") {
           // 前の記事があればXMLとして確定
           if (currentTitle) {
+            const encodedTitle = encodeURIComponent(currentTitle);
             itemsXml += `
               <item>
                 <title><![CDATA[${currentTitle}]]></title>
-                <link>https://www.notion.so/${pageId.replace(/-/g, "")}</link>
-                <guid>https://www.notion.so/${pageId.replace(/-/g, "")}#${encodeURIComponent(currentTitle)}</guid>
+                <link>https://www.notion.so/${cleanPageId}#${encodedTitle}</link>
+                <guid>https://www.notion.so/${cleanPageId}#${encodedTitle}</guid>
                 <description><![CDATA[${currentContent.trim()}]]></description>
               </item>`;
           }
@@ -54,11 +56,12 @@ export default {
 
       // 最後の記事を追加
       if (currentTitle) {
+        const encodedTitle = encodeURIComponent(currentTitle);
         itemsXml += `
           <item>
             <title><![CDATA[${currentTitle}]]></title>
-            <link>https://www.notion.so/${pageId.replace(/-/g, "")}</link>
-            <guid>https://www.notion.so/${pageId.replace(/-/g, "")}#${encodeURIComponent(currentTitle)}</guid>
+            <link>https://www.notion.so/${cleanPageId}#${encodedTitle}</link>
+            <guid>https://www.notion.so/${cleanPageId}#${encodedTitle}</guid>
             <description><![CDATA[${currentContent.trim()}]]></description>
           </item>`;
       }
@@ -68,7 +71,7 @@ export default {
 <rss version="2.0">
   <channel>
     <title><![CDATA[${pageTitle}]]></title>
-    <link>https://www.notion.so/${pageId.replace(/-/g, "")}</link>
+    <link>https://www.notion.so/${cleanPageId}</link>
     <description><![CDATA[Notion page parsed RSS feed for LAPRAS]]></description>
     <language>ja</language>
     ${itemsXml}
@@ -77,7 +80,8 @@ export default {
 
       return new Response(rssXml, {
         headers: {
-          "Content-Type": "application/xml; charset=utf-8",
+          // Content-Typeをrss+xmlに厳格化
+          "Content-Type": "application/rss+xml; charset=utf-8",
         },
       });
 
