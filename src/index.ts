@@ -26,6 +26,8 @@ export default {
       let itemsXml = "";
       let currentTitle = "";
       let currentContent = "";
+      // 記事ごとのpubDate用に現在時刻（またはページの更新日時など）を定義
+      const pubDate = new Date().toUTCString();
 
       // 3. ブロックを走査して「H2見出し」を区切りとして記事（item）に分解する
       for (const block of blocksResponse.results) {
@@ -41,6 +43,7 @@ export default {
                 <link>https://www.notion.so/${cleanPageId}#${encodedTitle}</link>
                 <guid>https://www.notion.so/${cleanPageId}#${encodedTitle}</guid>
                 <description><![CDATA[${currentContent.trim()}]]></description>
+                <pubDate>${pubDate}</pubDate>
               </item>`;
           }
           // 新しいセクションの開始
@@ -63,6 +66,7 @@ export default {
             <link>https://www.notion.so/${cleanPageId}#${encodedTitle}</link>
             <guid>https://www.notion.so/${cleanPageId}#${encodedTitle}</guid>
             <description><![CDATA[${currentContent.trim()}]]></description>
+            <pubDate>${pubDate}</pubDate>
           </item>`;
       }
 
@@ -80,7 +84,6 @@ export default {
 
       return new Response(rssXml, {
         headers: {
-          // Content-Typeをrss+xmlに厳格化
           "Content-Type": "application/rss+xml; charset=utf-8",
         },
       });
