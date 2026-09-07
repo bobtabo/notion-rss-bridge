@@ -12,13 +12,13 @@ Notionの特定ページ（開発ログなど）のブロック構造をパー�
 
 1. **Notionインテグレーションの作成** 🔑
 * Notionのインテグレーション設定からアクセストークン（シークレット）を取得する。
-* 対象のNotionページの「接続（Connections）」メニューから、作成したインテグレーションを許可する。
+* 対象のNotionページの右上「…」メニュー ＞「接続」から、作成したインテグレーションを許可する。
 
 
 2. **Cloudflare Workersの設定** 🔐
 Cloudflareダッシュボードの **Settings > Variables and Secrets** に以下のシークレット・環境変数を登録する：
 * `NOTION_API_KEY`: Notionのアクセストークン
-* `NOTION_PAGE_ID`: 読み込みたいNotionページの32桁のUUID
+* `NOTION_PAGE_ID`: 読み込みたいNotionページのID（※ `AI-XXXX` のようなプレフィックスが含まれる場合は、プレフィックスを除いた `XXXX` の32桁のUUID部分のみを指定する）
 
 
 3. **デプロイ** 🚀
