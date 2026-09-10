@@ -1,7 +1,3 @@
 name = "notion-rss-bridge"
 main = "src/index.ts"
 compatibility_date = "2026-03-07"
-
-[vars]
-# NotionのページIDをここに設定（またはCloudflareのSecretsに登録）
-NOTION_PAGE_ID = "3301b431540580938635e6e691ffc28a"
